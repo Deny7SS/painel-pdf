@@ -657,6 +657,132 @@ input:focus, select:focus, textarea:focus {
   overflow: hidden;
 }
 
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+/* Mobile First Adjustments */
+@media (max-width: 768px) {
+  .topbar {
+    padding: 0 16px;
+    height: auto;
+    flex-wrap: wrap;
+    position: relative;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .logo {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .topbar-actions {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+  }
+
+  .nav-tabs {
+    width: 100%;
+    justify-content: space-between;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .tab-btn {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    flex: 1;
+    text-align: center;
+  }
+
+  /* Forms Stack on Mobile */
+  .row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .form-group label {
+    font-size: 1rem; /* Better for touch */
+  }
+
+  input, select, textarea {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 14px;
+  }
+
+  /* Modal Fullscreen on Mobile */
+  .modal-content {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-width: none;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 80px; /* Space for actions */
+  }
+  
+  .modal-info {
+    padding: 24px;
+  }
+
+  .modal-cover {
+    height: 250px;
+  }
+  
+  .modal-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--color-bg-panel);
+    padding: 16px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+    z-index: 100;
+  }
+  
+  .close-modal {
+    top: 10px;
+    right: 10px;
+    background: rgba(0,0,0,0.5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+  }
+  
+  /* Toolbar stack */
+  .toolbar {
+    flex-direction: column;
+  }
+  
+  #searchInput {
+    max-width: none;
+  }
+  
+  #refreshBtn {
+    width: 100%;
+    border-radius: var(--radius-md);
+    padding: 12px;
+  }
+  
+  /* Larger touch targets */
+  .book-card-simple {
+    flex: 0 0 140px; /* Slightly smaller cards to fit more */
+  }
+  
+  .genre-title {
+    font-size: 1.3rem;
+  }
+}
