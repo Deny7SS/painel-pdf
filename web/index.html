@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca Virtual</title>
+  <link rel="stylesheet" href="/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Modal de Detalhes -->
+  <div id="bookModal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div class="modal-body">
+        <img id="modalCover" class="modal-cover" src="" alt="Capa">
+        <div class="modal-info">
+          <h2 id="modalTitle">Título do Livro</h2>
+          <p id="modalAuthor" class="modal-author">Autor</p>
+          <div class="modal-tags">
+            <span id="modalGenre" class="tag">Gênero</span>
+            <span id="modalYear" class="tag">Ano</span>
+            <span id="modalPages" class="tag">0 págs</span>
+            <span id="modalRating" class="tag">★ 0.0</span>
+          </div>
+          <p id="modalSynopsis" class="modal-synopsis">Sinopse...</p>
+          <div id="modalFiles" class="modal-files"></div>
+          <div class="modal-actions">
+            <button id="modalEditBtn" class="btn-edit">Editar</button>
+            <button id="modalDeleteBtn" class="btn-delete">Excluir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação -->
+  <div id="confirmModal" class="modal">
+    <div class="modal-content modal-confirm">
+      <h3 id="confirmTitle">Tem certeza?</h3>
+      <p id="confirmMessage">Essa ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button id="confirmCancelBtn" class="btn-secondary">Cancelar</button>
+        <button id="confirmOkBtn" class="btn-delete">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Alerta -->
+  <div id="alertModal" class="modal">
+    <div class="modal-content modal-confirm">
+      <h3 id="alertTitle">Aviso</h3>
+      <p id="alertMessage">Mensagem de alerta.</p>
+      <div class="modal-actions" style="justify-content: flex-end;">
+        <button id="alertOkBtn" class="btn-primary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="logo">
+      <h1>📚 Biblioteca</h1>
+    </div>
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="library">Biblioteca</button>
+      <button class="tab-btn" data-tab="add">Adicionar Livro</button>
+      <button class="tab-btn" data-tab="config">Configurações</button>
+    </nav>
+    <div class="topbar-actions">
+      <span id="connectionStatus" class="status-indicator">●</span>
+      <button id="logoutBtn" type="button" class="btn-sm">Sair</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    
+    <!-- Tela de Login (Overlay) -->
+    <div id="loginOverlay" class="login-overlay">
+      <div class="login-box">
+        <h2>Acesso Restrito</h2>
+        <p>Insira seu Token de Acesso e URL do PocketBase</p>
+        <form id="loginForm">
+          <input id="baseUrl" placeholder="URL (ex: https://kings01.store)" value="https://kings01.store" required>
+          <textarea id="manualToken" placeholder="Cole seu Token JWT aqui..." required></textarea>
+          <button type="submit">Entrar no Painel</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Aba: Biblioteca -->
+    <section id="tab-library" class="tab-content active">
+      <div class="toolbar">
+        <input id="searchInput" placeholder="Buscar por título, autor ou gênero...">
+        <button id="refreshBtn" title="Atualizar">↻</button>
+      </div>
+      <div id="booksContainer"></div>
+    </section>
+
+    <!-- Aba: Adicionar / Editar -->
+    <section id="tab-add" class="tab-content">
+      <div class="panel">
+        <h2 id="formTitle">Novo Livro</h2>
+        <form id="bookForm">
+          <input type="hidden" id="editingId" name="editingId">
+          
+          <div class="form-group">
+            <label>Título</label>
+            <div style="display: flex; gap: 10px;">
+              <input id="formTitulo" name="titulo" placeholder="Ex: O Senhor dos Anéis" required style="flex: 1;">
+              <button id="btnBuscarMetadata" type="button" class="btn-secondary" style="width: auto;">🔍 Buscar</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Autor</label>
+              <input id="formAutor" name="autor" placeholder="Ex: J.R.R. Tolkien">
+            </div>
+            <div class="form-group">
+              <label>Gênero</label>
+              <select id="formGenero" name="genero" required>
+                <option value="">Selecione...</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Páginas</label>
+              <input id="formPaginas" name="paginas" type="number" min="1" placeholder="0">
+            </div>
+            <div class="form-group">
+              <label>Ano de Lançamento</label>
+              <input id="formAno" name="ano" type="number" min="1000" max="2100" placeholder="Ex: 2024">
+            </div>
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+              <input id="formDestaque" name="destaque" type="checkbox" style="width: 20px; height: 20px;">
+              <label for="formDestaque" style="margin: 0; cursor: pointer;">Em Destaque?</label>
+              
+              <input id="formNovidade" name="novidade" type="checkbox" style="width: 20px; height: 20px; margin-left: 15px;">
+              <label for="formNovidade" style="margin: 0; cursor: pointer;">É Novidade?</label>
+            </div>
+            
+            <div id="destaqueDurationGroup" class="form-group" style="display: none; background: rgba(227, 179, 65, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #e3b341;">
+              <label style="color: #e3b341;">Duração do Destaque</label>
+              <select id="formDestaqueDuracao">
+                <option value="">Indefinido (Sempre em Destaque)</option>
+                <option value="5">5 Dias</option>
+                <option value="7">7 Dias</option>
+                <option value="15">15 Dias</option>
+              </select>
+            </div>
+
+            <div id="novidadeDurationGroup" class="form-group" style="display: none; background: rgba(35, 134, 54, 0.1); padding: 10px; border-radius: 8px; border: 1px dashed #238636;">
+              <label style="color: #3fb950;">Duração da Novidade</label>
+              <select id="formNovidadeDuracao">
+                <option value="">Indefinido (Sempre Novo)</option>
+                <option value="5">5 Dias</option>
+                <option value="7">7 Dias</option>
+                <option value="15">15 Dias</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Avaliação (0-5)</label>
+              <input id="formAvaliacao" name="avaliacao" type="number" min="0" max="5" step="0.1" placeholder="0.0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Sinopse</label>
+            <textarea id="formSinopse" name="sinopse" placeholder="Breve descrição..."></textarea>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Arquivos (PDF, EPUB...)</label>
+              <div class="file-input-wrapper">
+                <input id="arquivoInput" type="file" name="arquivo" multiple>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Capa (Imagem)</label>
+              <div class="file-input-wrapper">
+                <img id="formCapaPreview" style="max-width: 120px; max-height: 180px; display: none; margin: 0 auto 10px; border-radius: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+                <input id="capaInput" type="file" name="capa" accept="image/*">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button id="cancelEditBtn" type="button" class="btn-secondary" style="display: none;">Cancelar</button>
+            <button id="saveBookBtn" type="submit" class="btn-primary">Salvar Livro</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Aba: Configurações -->
+    <section id="tab-config" class="tab-content">
+      <div class="panel">
+        <h2>Gerenciar Gêneros</h2>
+        <div class="genre-manager">
+          <div class="row" style="margin-bottom: 0;">
+            <input id="newGenreInput" placeholder="Novo Gênero (ex: Ficção)">
+            <button id="addGenreBtn" type="button">Adicionar</button>
+          </div>
+          <div id="genresList" class="tags-list"></div>
+        </div>
+      </div>
+      
+      <div class="panel" style="margin-top: 20px;">
+        <h2>Dados de Conexão</h2>
+        <p style="color: #8b949e; font-size: 0.9rem;">Esses dados estão salvos no seu navegador.</p>
+        <div class="row">
+          <button id="changeTokenBtn" class="btn-secondary">Alterar Token/URL</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <template id="bookCardTemplate">
+    <article class="book-card-simple">
+      <div class="card-cover-wrapper">
+        <img class="cover" alt="Capa">
+        <div class="card-badge" style="display: none;">★</div>
+        <div class="card-badge-new" style="display: none;">NOVO</div>
+        <div class="card-overlay">
+          <span class="view-details">Ver Detalhes</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <h3 class="book-title">Título</h3>
+      </div>
+    </article>
+  </template>
+
+  <script src="/app.js?v=2026030746"></script>
+</body>
+</html>
